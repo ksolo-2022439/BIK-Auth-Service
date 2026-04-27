@@ -1,0 +1,6 @@
+@BIK.AuthService.API_HostAddress = http://localhost:5213
+
+GET {{BIK.AuthService.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
