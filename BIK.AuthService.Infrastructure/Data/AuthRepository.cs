@@ -2,6 +2,10 @@ using BIK.AuthService.Application.Interfaces;
 using BIK.AuthService.Domain.Entities;
 using MongoDB.Driver;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace BIK.AuthService.Infrastructure.Data
 {
@@ -11,6 +15,19 @@ namespace BIK.AuthService.Infrastructure.Data
 
         public AuthRepository(string connectionString, string databaseName)
         {
+            var conventionPack = new ConventionPack { new CamelCaseElementNameConvention() };
+            ConventionRegistry.Register("camelCase", conventionPack, t => true);
+
+            if (!BsonClassMap.IsClassMapRegistered(typeof(AuthUser)))
+            {
+                BsonClassMap.RegisterClassMap<AuthUser>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                    cm.MapIdMember(c => c.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                });
+            }
+
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase(databaseName);
             _usersCollection = database.GetCollection<AuthUser>("users"); 
