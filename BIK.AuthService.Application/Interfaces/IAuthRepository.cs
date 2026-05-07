@@ -7,5 +7,6 @@ namespace BIK.AuthService.Application.Interfaces
     {
         Task<AuthUser?> GetUserByIdentifierAsync(string identifier);
         Task CreateCredentialsAsync(AuthUser user);
+        Task CreateLoginNotificationAsync(string userId);
     }
 }

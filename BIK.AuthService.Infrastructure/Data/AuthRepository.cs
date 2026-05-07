@@ -12,6 +12,7 @@ namespace BIK.AuthService.Infrastructure.Data
     public class AuthRepository : IAuthRepository
     {
         private readonly IMongoCollection<AuthUser> _usersCollection;
+        private readonly IMongoCollection<BsonDocument> _notificationsCollection;
 
         public AuthRepository(string connectionString, string databaseName)
         {
@@ -31,6 +32,7 @@ namespace BIK.AuthService.Infrastructure.Data
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase(databaseName);
             _usersCollection = database.GetCollection<AuthUser>("users"); 
+            _notificationsCollection = database.GetCollection<BsonDocument>("notifications");
         }
 
         public async Task<AuthUser?> GetUserByIdentifierAsync(string identifier)
@@ -47,6 +49,22 @@ namespace BIK.AuthService.Infrastructure.Data
         public async Task CreateCredentialsAsync(AuthUser user)
         {
             await _usersCollection.InsertOneAsync(user);
+        }
+
+        public async Task CreateLoginNotificationAsync(string userId)
+        {
+            var notification = new BsonDocument
+            {
+                { "usuarioId", new ObjectId(userId) },
+                { "titulo", "Nuevo inicio de sesión" },
+                { "mensaje", $"Se detectó un nuevo inicio de sesión el {System.DateTime.Now:dd/MM/yyyy HH:mm}." },
+                { "tipo", "Seguridad" },
+                { "leida", false },
+                { "createdAt", System.DateTime.UtcNow },
+                { "updatedAt", System.DateTime.UtcNow }
+            };
+
+            await _notificationsCollection.InsertOneAsync(notification);
         }
     }
 }

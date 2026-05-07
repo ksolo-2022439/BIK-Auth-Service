@@ -42,6 +42,9 @@ namespace BIK.AuthService.API.Controllers
             }
 
             var token = GenerateJwtToken(user);
+            
+            // Crear notificación de inicio de sesión
+            await _repository.CreateLoginNotificationAsync(user.Id);
 
             return Ok(new { status = "success", token, rol = user.Rol });
         }
@@ -82,7 +85,7 @@ namespace BIK.AuthService.API.Controllers
                 issuer: "BIK-AuthService",
                 audience: "BIK-Clients",
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds
             );
 
