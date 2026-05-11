@@ -69,6 +69,27 @@ namespace BIK.AuthService.API.Controllers
             return StatusCode(201, new { status = "success", message = "Credenciales registradas exitosamente" });
         }
 
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var user = await _repository.GetUserByIdentifierAsync(request.UserId);
+
+            if (user == null)
+            {
+                return NotFound(new { status = "error", message = "Usuario no encontrado" });
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+            {
+                return BadRequest(new { status = "error", message = "La contraseña actual es incorrecta" });
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _repository.UpdateUserAsync(user);
+
+            return Ok(new { status = "success", message = "Contraseña actualizada exitosamente" });
+        }
+
         private string GenerateJwtToken(AuthUser user)
         {
             var jwtSecret = _configuration["JwtSettings:Secret"] ?? "TuClaveSecretaSuperSeguraParaValidarTokensDeCSharp"; 

@@ -66,5 +66,10 @@ namespace BIK.AuthService.Infrastructure.Data
 
             await _notificationsCollection.InsertOneAsync(notification);
         }
+
+        public async Task UpdateUserAsync(AuthUser user)
+        {
+            await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+        }
     }
 }
