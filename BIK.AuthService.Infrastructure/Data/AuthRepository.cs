@@ -48,7 +48,13 @@ namespace BIK.AuthService.Infrastructure.Data
 
         public async Task CreateCredentialsAsync(AuthUser user)
         {
-            await _usersCollection.InsertOneAsync(user);
+            var filter = Builders<AuthUser>.Filter.Eq(u => u.Id, user.Id);
+            var update = Builders<AuthUser>.Update
+                .Set(u => u.PasswordHash, user.PasswordHash)
+                .Set(u => u.Rol, user.Rol)
+                .Set(u => u.Estado, user.Estado);
+
+            await _usersCollection.UpdateOneAsync(filter, update);
         }
 
         public async Task CreateLoginNotificationAsync(string userId)
