@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+/// <summary>
+/// Punto de entrada del microservicio de Autenticación de BIK.
+/// Configura la inyección de dependencias de MongoDB, el esquema de autenticación JWT Bearer, CORS y Swagger.
+/// </summary>
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
