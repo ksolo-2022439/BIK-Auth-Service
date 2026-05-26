@@ -100,7 +100,7 @@ namespace BIK.AuthService.Infrastructure.Data
                 { "titulo", "Nuevo inicio de sesión" },
                 { "mensaje", $"Se detectó un nuevo inicio de sesión el {System.DateTime.Now:dd/MM/yyyy HH:mm}." },
                 { "tipo", "Seguridad" },
-                { "leida", false },
+                { "leido", false },
                 { "createdAt", System.DateTime.UtcNow },
                 { "updatedAt", System.DateTime.UtcNow }
             };
