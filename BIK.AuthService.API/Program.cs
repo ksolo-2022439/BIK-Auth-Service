@@ -23,8 +23,10 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:5173",
                 "http://localhost:5174",
+                "http://localhost:5000",
                 "http://bik-client-user:5173",
-                "http://bik-client-admin:5174"
+                "http://bik-client-admin:5174",
+                "http://bik-server-user:5000"
             )
               .AllowAnyMethod()
               .AllowAnyHeader()
