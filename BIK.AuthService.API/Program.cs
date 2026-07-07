@@ -3,6 +3,7 @@ using BIK.AuthService.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Linq;
 
 /// <summary>
 /// Punto de entrada del microservicio de Autenticación de BIK.
@@ -16,18 +17,32 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // SEC-009: Restringir CORS a orígenes conocidos
+var allowedOriginsSetting = builder.Configuration["AllowedOrigins"];
+var allowedOrigins = !string.IsNullOrEmpty(allowedOriginsSetting)
+    ? allowedOriginsSetting.Split(',', StringSplitOptions.RemoveEmptyEntries)
+    : new[]
+    {
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5000",
+        "http://bik-client-user:5173",
+        "http://bik-client-admin:5174",
+        "http://bik-server-user:5000"
+    };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBIKClients", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://localhost:5000",
-                "http://bik-client-user:5173",
-                "http://bik-client-admin:5174",
-                "http://bik-server-user:5000"
-            )
+        policy.WithOrigins(allowedOrigins)
+              .SetIsOriginAllowed(origin =>
+              {
+                  var host = new Uri(origin).Host;
+                  return host.Equals("localhost") || 
+                         host.Equals("127.0.0.1") || 
+                         host.EndsWith(".vercel.app") ||
+                         allowedOrigins.Contains(origin);
+              })
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
